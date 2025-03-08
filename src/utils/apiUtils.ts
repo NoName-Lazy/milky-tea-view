@@ -3,6 +3,8 @@ import { useUserStore } from "@/stores/user";
 import axios from "axios";
 import { alertFail, showFail, showSuccess } from "./showMessage";
 import qs from "qs";
+import { gotoBack, gotoLogin } from "@/router";
+
 let userStore: ReturnType<typeof useUserStore>;
 const url = baseUrl;
 axios.defaults.baseURL = url;
@@ -30,10 +32,10 @@ axiosClient.interceptors.response.use(
 );
 export async function apiLogin(loginData: any) {
   userStore = useUserStore();
-//   console.log(loginData);
+  console.log(loginData);
   try {
     let res = await axiosClient.post("/login", qs.stringify(loginData));
-    let token = "Bearer " + res?.data?.access_token;
+    let token = "Bearer " + res?.data?.token;
     console.log(res, token);
 
     userStore.setToken(token);
@@ -65,6 +67,48 @@ export async function apiLogout() {
     return Promise.resolve(res.data ? res.data : res?.statusText);
   } catch (error: any) {
     alertFail(apiLogout.name, error?.message);
-    return error;
+    if (res?.status && res.status == 401) {
+      userStore.setLoginState(false);
+      userStore.setToken("");
+      userStore.setUser({});
+    }
+    gotoLogin();
+  }
+}
+export async function apiDeleteImageByPath(path: any) {
+  console.log(apiDeleteImageByPath.name, path);
+  if (path) {
+    try {
+      let data = await axiosClient.delete("/deleteimage-bypath" + path);
+      showSuccess(apiDeleteImageByPath.name, data);
+      return Promise.resolve(data);
+    } catch (error) {
+      let login = await autoLogin(error);
+      if (login) {
+        try {
+          let data = await axiosClient.delete("/deleteimage-bypath" + path);
+          showSuccess(apiDeleteImageByPath.name, data);
+          return Promise.resolve(data);
+        } catch (error: any) {
+          alertFail(apiDeleteImageByPath.name, error?.message);
+        }
+      }
+    }
+  } else {
+    alertFail(apiDeleteImageByPath.name, "待删除文件path不能为空");
+  }
+}
+
+async function autoLogin(error: any) {
+  if (error.status == 401) {
+    userStore = useUserStore();
+    let loginData = {
+      account: userStore.account,
+      password: userStore.password,
+    };
+    let data = await apiLogin(loginData);
+    return Promise.resolve(data);
+  } else {
+    alertFail(error?.message, "");
   }
 }

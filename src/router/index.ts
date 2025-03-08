@@ -1,10 +1,9 @@
 import Login from "@/views/Login.vue";
-import Profile from "@/views/Profile.vue";
+import Profile from "@/views/TestImageuploader.vue";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
-  { path: "/", name: "Home", component: Login },
+  { path: "/", name: "Home", component: Profile },
   { path: "/login", name: "Login", component: Login },
-  { path: "/profile", name: "Profile", component: Profile },
 ];
 
 const router = createRouter({
