@@ -1,7 +1,7 @@
 import { baseUrl } from "@/stores/basic-data";
 import { useUserStore } from "@/stores/user";
 import axios from "axios";
-import { alertFail, showFail, showSuccess } from "./showMessage";
+import { alertFail, alertSuccess, showFail, showSuccess } from "./showMessage";
 import qs from "qs";
 import { gotoBack, gotoLogin } from "@/router";
 
@@ -45,7 +45,7 @@ export async function apiLogin(loginData: any) {
     alertFail(apiLogin.name, error?.message);
   }
 }
-export async function apiProfile() {
+export async function apiGetProfile() {
   userStore = useUserStore();
   try {
     let res = await axiosClient.get("/profile");
@@ -53,7 +53,7 @@ export async function apiProfile() {
     userStore.setUser(userData);
     return Promise.resolve(userData);
   } catch (error: any) {
-    alertFail(apiProfile.name, error?.message);
+    alertFail(apiGetProfile.name, error?.message);
   }
 }
 export async function apiLogout() {
@@ -75,29 +75,6 @@ export async function apiLogout() {
     gotoLogin();
   }
 }
-export async function apiDeleteImageByPath(path: any) {
-  console.log(apiDeleteImageByPath.name, path);
-  if (path) {
-    try {
-      let data = await axiosClient.delete("/deleteimage-bypath" + path);
-      showSuccess(apiDeleteImageByPath.name, data);
-      return Promise.resolve(data);
-    } catch (error) {
-      let login = await autoLogin(error);
-      if (login) {
-        try {
-          let data = await axiosClient.delete("/deleteimage-bypath" + path);
-          showSuccess(apiDeleteImageByPath.name, data);
-          return Promise.resolve(data);
-        } catch (error: any) {
-          alertFail(apiDeleteImageByPath.name, error?.message);
-        }
-      }
-    }
-  } else {
-    alertFail(apiDeleteImageByPath.name, "待删除文件path不能为空");
-  }
-}
 
 async function autoLogin(error: any) {
   if (error.status == 401) {
@@ -110,5 +87,45 @@ async function autoLogin(error: any) {
     return Promise.resolve(data);
   } else {
     alertFail(error?.message, "");
+  }
+}
+
+export async function apiModifyPassword(id: Number, password: string) {
+  let modifyData = {
+    id: id,
+    password: password,
+  };
+  try {
+    let res = await axiosClient.patch(
+      "/modify-password",
+      qs.stringify(modifyData)
+    );
+    console.log(res?.data.message);
+
+    if (res?.data) {
+      alertSuccess(apiModifyPassword.name, res?.data.message);
+      return Promise.resolve(res.data);
+    } else {
+      alertFail(apiModifyPassword.name, "Fail to modify password");
+    }
+  } catch (error: any) {
+    alertFail(apiModifyPassword.name, error?.message);
+  }
+}
+export async function apiRename(id: Number, username: string) {
+  let renameData = {
+    id: id,
+    username: username,
+  };
+  try {
+    let res = await axiosClient.patch("/rename", qs.stringify(renameData));
+    if (res?.data) {
+      alertSuccess(apiRename.name, res?.data.message);
+      return Promise.resolve(res.data);
+    } else {
+      alertFail(apiRename.name, "Fail to rename");
+    }
+  } catch (error: any) {
+    alertFail(apiRename.name, error?.message);
   }
 }

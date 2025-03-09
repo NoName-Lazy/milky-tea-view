@@ -1,5 +1,5 @@
 import Login from "@/views/Login.vue";
-import Profile from "@/views/TestImageuploader.vue";
+import Profile from "@/views/Profile.vue";
 import { createRouter, createWebHistory } from "vue-router";
 const routes = [
   { path: "/", name: "Home", component: Profile },

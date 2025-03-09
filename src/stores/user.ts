@@ -21,8 +21,8 @@ export const useUserStore = defineStore("user", {
       user: {},
       token: "",
       isLogin: false,
-      account: "123",
-      password: "123",
+      account: "",
+      password: "",
     };
   },
   getters: {

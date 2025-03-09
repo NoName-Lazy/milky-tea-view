@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { gotoLogin } from "@/router";
 import { imageBaseUrl, imgUploadUrl } from "@/stores/basic-data";
 import { useUserStore } from "@/stores/user";
 import { apiDeleteImageByPath } from "@/utils/apiUtils";
