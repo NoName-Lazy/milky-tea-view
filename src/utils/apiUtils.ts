@@ -32,12 +32,11 @@ axiosClient.interceptors.response.use(
 );
 export async function apiLogin(loginData: any) {
   userStore = useUserStore();
-  console.log(loginData);
+
   try {
     let res = await axiosClient.post("/login", qs.stringify(loginData));
-    let token = "Bearer " + res?.data?.token;
-    console.log(res, token);
-
+    // console.log(res);
+    let token = "Bearer " + res?.data?.user?.token;
     userStore.setToken(token);
     userStore.setLoginState(true);
     return Promise.resolve(res?.data);
@@ -45,10 +44,11 @@ export async function apiLogin(loginData: any) {
     alertFail(apiLogin.name, error?.message);
   }
 }
-export async function apiGetProfile() {
+
+export async function apiGetProfile(id: Number) {
   userStore = useUserStore();
   try {
-    let res = await axiosClient.get("/profile");
+    let res = await axiosClient.get("/profile", { params: { id } });
     let userData = res?.data;
     userStore.setUser(userData);
     return Promise.resolve(userData);
@@ -56,6 +56,7 @@ export async function apiGetProfile() {
     alertFail(apiGetProfile.name, error?.message);
   }
 }
+
 export async function apiLogout() {
   userStore = useUserStore();
   let res;
@@ -76,56 +77,20 @@ export async function apiLogout() {
   }
 }
 
-async function autoLogin(error: any) {
-  if (error.status == 401) {
-    userStore = useUserStore();
-    let loginData = {
-      account: userStore.account,
-      password: userStore.password,
-    };
-    let data = await apiLogin(loginData);
-    return Promise.resolve(data);
-  } else {
-    alertFail(error?.message, "");
-  }
-}
-
-export async function apiModifyPassword(id: Number, password: string) {
-  let modifyData = {
-    id: id,
-    password: password,
-  };
+export async function apiModifyPassword(modifyData: {
+  id: number;
+  password: string;
+}) {
   try {
     let res = await axiosClient.patch(
       "/modify-password",
       qs.stringify(modifyData)
     );
-    console.log(res?.data.message);
-
-    if (res?.data) {
-      alertSuccess(apiModifyPassword.name, res?.data.message);
-      return Promise.resolve(res.data);
-    } else {
-      alertFail(apiModifyPassword.name, "Fail to modify password");
-    }
+    console.log(res);
+    alertSuccess(apiModifyPassword.name, res?.data?.message);
+    return Promise.resolve(res);
   } catch (error: any) {
     alertFail(apiModifyPassword.name, error?.message);
-  }
-}
-export async function apiRename(id: Number, username: string) {
-  let renameData = {
-    id: id,
-    username: username,
-  };
-  try {
-    let res = await axiosClient.patch("/rename", qs.stringify(renameData));
-    if (res?.data) {
-      alertSuccess(apiRename.name, res?.data.message);
-      return Promise.resolve(res.data);
-    } else {
-      alertFail(apiRename.name, "Fail to rename");
-    }
-  } catch (error: any) {
-    alertFail(apiRename.name, error?.message);
+    return Promise.reject(error);
   }
 }

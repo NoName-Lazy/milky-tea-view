@@ -78,9 +78,9 @@ const isButtonDisabled = ref(true);
 
 async function LogIn() {
   let data = await apiLogin(formData);
-    console.log(data);
+  // console.log(data);
   if (data) {
-    userStore.setUser(formData.account);
+    userStore.setUser(data);
     userStore.setPassword(formData.password);
     gotoBack();
   }

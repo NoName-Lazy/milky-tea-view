@@ -3,8 +3,8 @@
     <nut-button @click="gotoLogin">登录</nut-button>
   </div>
   <div>
-    <nut-image :src="absoluteSrc" width="100" height="100"></nut-image>
-    <a :href="absoluteSrc">跳转</a>
+    <nut-image :src="absoluteSrc" width="100" height="100" />
+    <a :href="absoluteSrc">跳转 </a>
   </div>
   <div>
     <span>压缩图片</span>
@@ -29,6 +29,7 @@ import { gotoLogin } from "@/router";
 import { imageBaseUrl } from "@/stores/basic-data";
 import { computed, ref } from "vue";
 import ImageUploader from "./ImageUploader.vue";
+
 const isCompression = ref(false);
 const src = ref("");
 const absoluteSrc = computed(() => imageBaseUrl + src.value);

@@ -1,54 +1,44 @@
 <template>
-  <nut-navbar title="用户信息" left-show @click-back="gotoBack"></nut-navbar>
-  <div v-if="userStoreRef.isLogin.value">
-    <nut-cell title="头像" center>
+  <div v-if="userStore.isLogin">
+    <nut-navbar title="Milky-tea" left-show @click-back="gotoBack"></nut-navbar>
+    <nut-cell title="头像">
       <template #icon>
-        <Image />
+        <Jimi40 />
       </template>
       <template #desc>
-        <nut-avatar size="normal">
-          <img :src="userDetail.avatar" />
-        </nut-avatar>
+        <div class="avatar-image">
+          <nut-image
+            :src="userDetail.avatar"
+            width="50"
+            height="50"
+            fit="cover"
+            round
+          ></nut-image>
+        </div>
       </template>
     </nut-cell>
-    <nut-cell title="用户名" center is-link @click="changeNameView">
+    <nut-cell title="用户名">
       <template #icon>
         <My />
       </template>
       <template #desc>
-        <span>{{ userDetail.username }}</span>
+        <div>{{ userDetail.username }}</div>
       </template>
     </nut-cell>
-    <nut-input
-      v-model="newName"
-      placeholder="请输入用户名"
-      clearable
-      v-if="nameView"
-    >
-      <template #left>
+    <nut-cell title="修改密码" is-link @click="changePwdView">
+      <template #icon>
         <Edit />
       </template>
-      <template #right>
-        <nut-button type="info" size="small" @click="changeUsername"
-          >确定</nut-button
-        >
-      </template>
-    </nut-input>
-
-    <nut-cell title="修改密码" is-link @click="changePwdView" center>
-      <template #icon>
-        <Eye />
-      </template>
     </nut-cell>
     <nut-input
-      v-model="newPwd"
+      v-model="newPassword"
       placeholder="请输入新密码"
       clearable
       v-if="pwdView"
       :type="pwdStyle"
     >
       <template #left>
-        <Edit @click="changePwdStyle"></Edit>
+        <Eye @click="changePwdStyle"></Eye>
       </template>
       <template #right>
         <nut-button type="info" size="small" @click="changePassword"
@@ -56,84 +46,95 @@
         >
       </template>
     </nut-input>
-    <nut-cell title="邮箱" center>
+    <nut-cell title="邮箱">
       <template #icon>
-        <Jdl />
+        <Dongdong />
       </template>
       <template #desc>
-        <span>{{ userDetail.email }}</span>
+        <div>{{ userDetail.email }}</div>
       </template>
     </nut-cell>
-    <nut-cell title="手机号" center>
+    <nut-cell title="电话">
       <template #icon>
         <Notice />
       </template>
       <template #desc>
-        <span>{{ userDetail.phone }}</span>
+        <div>{{ userDetail.phone }}</div>
       </template>
     </nut-cell>
-    <nut-cell title="地址" center>
+    <nut-cell title="地址">
       <template #icon>
         <Location2 />
       </template>
       <template #desc>
-        <span>{{ userDetail.address }}</span>
+        <div>{{ userDetail.address }}</div>
       </template>
     </nut-cell>
     <div class="center">
-      <nut-button type="primary" @click="logout" plain color="#880000"
+      <nut-button type="info" @click="logout" plain color="#880000"
         >登出</nut-button
       >
     </div>
   </div>
-  <div v-else class="center">
-    <nut-button type="info" @click="gotoLogin" color="#880000"
-      >去登录</nut-button
-    >
+  <div v-else>
+    <nut-navbar title="Milky-tea" left-show @click-back="gotoBack"></nut-navbar>
+    <div class="center">
+      <nut-button type="primary" @click="login" color="#880000"
+        >去登录</nut-button
+      >
+    </div>
   </div>
 </template>
 
+// Profile.vue
 <script setup lang="ts">
-import { gotoBack, gotoLogin as login } from "@/router";
+import { gotoBack, gotoLogin } from "@/router";
 import { useUserStore } from "@/stores/user";
 import {
-  apiLogout,
   apiGetProfile,
+  apiLogin,
+  apiLogout,
   apiModifyPassword,
-  apiRename,
 } from "@/utils/apiUtils";
 import { storeToRefs } from "pinia";
-import { onMounted, reactive, ref } from "vue";
-import { Eye, My, Image, Location2, Jdl, Notice, Edit } from "@nutui/icons-vue";
+import { onMounted, ref } from "vue";
+import {
+  Dongdong,
+  Edit,
+  Eye,
+  Jimi40,
+  Location2,
+  My,
+  Notice,
+} from "@nutui/icons-vue";
+
 const userStore = useUserStore();
 const userStoreRef = storeToRefs(userStore);
-const userDetail = reactive({
-  id: 0,
-  avatar: "",
-  username: "",
-  email: "",
-  phone: "",
-  address: "",
-});
+const userDetail = userStore.user.user;
 
+const newPassword = ref("");
 const pwdView = ref(false);
-const newPwd = ref(userStore.getDecodedPwd);
 const inputTypes = ["password", "text"];
 const pwdStyle = ref(inputTypes[0]);
 
-const newName = ref(userDetail.username);
-const nameView = ref(false);
-
-async function changePassword() {
-  let data = await apiModifyPassword(userDetail.id, newPwd.value);
-  if (data) {
-    userStore.setPassword(newPwd.value);
-  }
+async function GetProfile() {
+  await apiGetProfile(userDetail.id);
 }
 
-async function changeUsername() {
-  await apiRename(userDetail.id, newName.value);
-  getProfileDetail();
+async function logout() {
+  await apiLogout();
+}
+
+function login() {
+  gotoLogin();
+}
+
+async function changePassword() {
+  let modifyData = {
+    id: userDetail.id,
+    password: newPassword.value,
+  };
+  await apiModifyPassword(modifyData);
 }
 
 function changePwdStyle() {
@@ -147,32 +148,14 @@ function changePwdStyle() {
 function changePwdView() {
   pwdView.value = !pwdView.value;
   if (pwdView.value) {
-    newPwd.value = userStore.getDecodedPwd;
+    newPassword.value = "";
   }
 }
 
-function changeNameView() {
-  nameView.value = !nameView.value;
-}
-
-async function logout() {
-  await apiLogout();
-}
-function gotoLogin() {
-  login();
-}
-async function getProfileDetail() {
-  let data = await apiGetProfile();
-  userDetail.id = data.user.id;
-  userDetail.avatar = data.user.avatar;
-  userDetail.username = data.user.username;
-  userDetail.email = data.user.email;
-  userDetail.phone = data.user.phone;
-  userDetail.address = data.user.address;
-  console.log(userDetail);
-}
-onMounted(async () => {
-  getProfileDetail();
+onMounted(() => {
+  if (userStore.isLogin) {
+    GetProfile();
+  }
 });
 </script>
 
@@ -182,8 +165,14 @@ onMounted(async () => {
   justify-content: center;
   margin-top: 10px;
 }
-span {
-  color: black;
-  margin-right: 15px;
+
+.nut-cell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.avatar-image {
+  margin-left: 220px;
 }
 </style>
