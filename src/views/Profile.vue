@@ -17,7 +17,7 @@
         </div>
       </template>
     </nut-cell>
-    <nut-cell title="用户名">
+    <nut-cell title="用户名" is-link @click="changeNameView">
       <template #icon>
         <My />
       </template>
@@ -25,6 +25,31 @@
         <div>{{ userDetail.username }}</div>
       </template>
     </nut-cell>
+    <nut-popup
+      v-model:visible="showPopup"
+      position="bottom"
+      closeable
+      round
+      :style="{ height: '30%' }"
+      @click-overlay="changeshow"
+    >
+      <nut-input
+        v-model="newUsername"
+        placeholder="请更新用户名"
+        clearable
+        v-if="nameView"
+      >
+        <template #left>
+          <Loading />
+        </template>
+        <template #right>
+          <nut-button type="info" size="small" @click="changeUsername"
+            >确定</nut-button
+          >
+        </template>
+      </nut-input>
+    </nut-popup>
+
     <nut-cell title="修改密码" is-link @click="changePwdView">
       <template #icon>
         <Edit />
@@ -103,6 +128,7 @@ import {
   Edit,
   Eye,
   Jimi40,
+  Loading,
   Location2,
   My,
   Notice,
@@ -116,6 +142,11 @@ const newPassword = ref("");
 const pwdView = ref(false);
 const inputTypes = ["password", "text"];
 const pwdStyle = ref(inputTypes[0]);
+
+const newUsername = ref("");
+const nameView = ref(false);
+
+const showPopup = ref(false);
 
 async function GetProfile() {
   await apiGetProfile(userDetail.id);
@@ -137,6 +168,8 @@ async function changePassword() {
   await apiModifyPassword(modifyData);
 }
 
+async function changeUsername() {}
+
 function changePwdStyle() {
   if (pwdStyle.value == inputTypes[0]) {
     pwdStyle.value = inputTypes[1];
@@ -150,6 +183,18 @@ function changePwdView() {
   if (pwdView.value) {
     newPassword.value = "";
   }
+}
+
+function changeNameView() {
+  changeshow();
+  if (nameView.value) {
+    newUsername.value = "";
+  }
+}
+
+function changeshow() {
+  showPopup.value = !showPopup.value;
+  nameView.value = !nameView.value;
 }
 
 onMounted(() => {
