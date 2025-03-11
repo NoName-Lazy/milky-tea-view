@@ -1,7 +1,6 @@
 <template>
   <div class="login">
     <nut-navbar title="Milky-tea" left-show @click-back="gotoBack"></nut-navbar>
-
     <nut-row type="flex" justify="center">
       <nut-col :span="18" fill>
         <div class="img">
@@ -80,7 +79,7 @@ async function LogIn() {
   let data = await apiLogin(formData);
   // console.log(data);
   if (data) {
-    userStore.setUser(data);
+    userStore.setUser(data.user);
     userStore.setPassword(formData.password);
     gotoBack();
   }

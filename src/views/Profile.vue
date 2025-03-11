@@ -8,7 +8,7 @@
       <template #desc>
         <div class="avatar-image">
           <nut-image
-            :src="userDetail.avatar"
+            :src="userDetail?.avatar"
             width="50"
             height="50"
             fit="cover"
@@ -22,7 +22,7 @@
         <My />
       </template>
       <template #desc>
-        <div>{{ userDetail.username }}</div>
+        <div>{{ userDetail?.username }}</div>
       </template>
     </nut-cell>
     <nut-popup
@@ -32,18 +32,24 @@
       round
       :style="{ height: '30%' }"
       @click-overlay="changeshow"
+      @click-close-icon="changeshow"
     >
       <nut-input
         v-model="newUsername"
         placeholder="请更新用户名"
         clearable
         v-if="nameView"
+        style="margin-top: 40px"
       >
         <template #left>
           <Loading />
         </template>
         <template #right>
-          <nut-button type="info" size="small" @click="changeUsername"
+          <nut-button
+            color="#880000"
+            type="info"
+            size="small"
+            @click="changeUsername"
             >确定</nut-button
           >
         </template>
@@ -76,7 +82,7 @@
         <Dongdong />
       </template>
       <template #desc>
-        <div>{{ userDetail.email }}</div>
+        <div>{{ userDetail?.email }}</div>
       </template>
     </nut-cell>
     <nut-cell title="电话">
@@ -84,7 +90,7 @@
         <Notice />
       </template>
       <template #desc>
-        <div>{{ userDetail.phone }}</div>
+        <div>{{ userDetail?.phone }}</div>
       </template>
     </nut-cell>
     <nut-cell title="地址">
@@ -92,7 +98,7 @@
         <Location2 />
       </template>
       <template #desc>
-        <div>{{ userDetail.address }}</div>
+        <div>{{ userDetail?.address }}</div>
       </template>
     </nut-cell>
     <div class="center">
@@ -120,9 +126,10 @@ import {
   apiLogin,
   apiLogout,
   apiModifyPassword,
+  apiModifyUsername,
 } from "@/utils/apiUtils";
 import { storeToRefs } from "pinia";
-import { onMounted, ref } from "vue";
+import { onActivated, onMounted, ref, watch } from "vue";
 import {
   Dongdong,
   Edit,
@@ -136,7 +143,7 @@ import {
 
 const userStore = useUserStore();
 const userStoreRef = storeToRefs(userStore);
-const userDetail = userStore.user.user;
+const userDetail: any = userStore.user;
 
 const newPassword = ref("");
 const pwdView = ref(false);
@@ -166,9 +173,20 @@ async function changePassword() {
     password: newPassword.value,
   };
   await apiModifyPassword(modifyData);
+  pwdView.value = false;
 }
 
-async function changeUsername() {}
+async function changeUsername() {
+  let modifyData = {
+    id: userDetail.id,
+    username: newUsername.value,
+  };
+  await apiModifyUsername(modifyData);
+
+  userDetail.username = newUsername.value;
+  showPopup.value = false;
+  nameView.value = false;
+}
 
 function changePwdStyle() {
   if (pwdStyle.value == inputTypes[0]) {
@@ -200,6 +218,7 @@ function changeshow() {
 onMounted(() => {
   if (userStore.isLogin) {
     GetProfile();
+    // console.log(userDetail);
   }
 });
 </script>

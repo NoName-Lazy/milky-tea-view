@@ -1,0 +1,7 @@
+/* 全局样式文件 */
+body {
+    transition: background-color 0.25s, color 0.25s;
+    color: var(--color-text, #000); /* 默认值为黑色 */
+    background-color: var(--color-body, #fff); /* 默认值为白色 */
+    color-scheme: var(--color-scheme, light); /* 默认为亮色模式 */
+  }
