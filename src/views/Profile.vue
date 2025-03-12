@@ -1,14 +1,15 @@
 <template>
   <div v-if="userStore.isLogin">
     <nut-navbar title="Milky-tea" left-show @click-back="gotoBack"></nut-navbar>
-    <nut-cell title="头像">
+
+    <nut-cell title="头像" is-link @click="openFilePicker">
       <template #icon>
         <Jimi40 />
       </template>
       <template #desc>
         <div class="avatar-image">
           <nut-image
-            :src="userDetail?.avatar"
+            :src="avatarUrl"
             width="50"
             height="50"
             fit="cover"
@@ -17,6 +18,13 @@
         </div>
       </template>
     </nut-cell>
+    <input
+      type="file"
+      ref="fileInput"
+      style="display: none"
+      accept="image/*"
+      @change="handleFileChange"
+    />
     <nut-cell title="用户名" is-link @click="changeNameView">
       <template #icon>
         <My />
@@ -129,7 +137,7 @@ import {
   apiModifyUsername,
 } from "@/utils/apiUtils";
 import { storeToRefs } from "pinia";
-import { onActivated, onMounted, ref, watch } from "vue";
+import { onActivated, onMounted, reactive, ref, watch } from "vue";
 import {
   Dongdong,
   Edit,
@@ -140,7 +148,7 @@ import {
   My,
   Notice,
 } from "@nutui/icons-vue";
-
+import { uploadImage, getAvatarUrl } from "@/utils/apiUtils";
 const userStore = useUserStore();
 const userStoreRef = storeToRefs(userStore);
 const userDetail: any = userStore.user;
@@ -155,6 +163,11 @@ const nameView = ref(false);
 
 const showPopup = ref(false);
 
+const avatarUrl = ref(
+  userDetail?.avatar ? getAvatarUrl(userDetail.avatar) : ""
+);
+const fileInput = ref<HTMLInputElement | null>(null);
+
 async function GetProfile() {
   await apiGetProfile(userDetail.id);
 }
@@ -166,6 +179,32 @@ async function logout() {
 function login() {
   gotoLogin();
 }
+
+// 打开文件选择器
+const openFilePicker = () => {
+  if (fileInput.value) {
+    fileInput.value.click();
+  }
+};
+
+// 处理文件选择
+const handleFileChange = async (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  if (target.files && target.files.length > 0) {
+    const file = target.files[0];
+    try {
+      const response = await uploadImage(userDetail.id, file);
+      // console.log(response);
+
+      avatarUrl.value = getAvatarUrl(response.user.avatar); // 更新头像 URL
+      // console.log(avatarUrl.value);
+
+      console.log("上传成功");
+    } catch (error) {
+      console.error("上传失败:", error);
+    }
+  }
+};
 
 async function changePassword() {
   let modifyData = {
@@ -199,7 +238,7 @@ function changePwdStyle() {
 function changePwdView() {
   pwdView.value = !pwdView.value;
   if (pwdView.value) {
-    newPassword.value = "";
+    newPassword.value = userStore.getDecodedPwd;
   }
 }
 

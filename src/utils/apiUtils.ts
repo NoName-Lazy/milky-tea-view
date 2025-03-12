@@ -1,10 +1,9 @@
-import { baseUrl } from "@/stores/basic-data";
+import { baseUrl, imgUploadUrl } from "@/stores/basic-data";
 import { useUserStore } from "@/stores/user";
 import axios from "axios";
 import { alertFail, alertSuccess, showFail, showSuccess } from "./showMessage";
 import qs from "qs";
 import { gotoBack, gotoLogin } from "@/router";
-import { useRouter } from "vue-router";
 
 let userStore: ReturnType<typeof useUserStore>;
 
@@ -124,3 +123,31 @@ export async function apiModifyUsername(modifyData: {
     return Promise.reject(error);
   }
 }
+
+const API_BASE_URL = "http://localhost:8080"; // 后端地址
+
+export const uploadImage = async (id: number, file: File) => {
+  const formData = new FormData();
+  formData.append("id", id.toString()); // 确保 id 是字符串
+  formData.append("image", file); // 文件对象
+
+  try {
+    const response = await axios.patch(
+      `${API_BASE_URL}/upload-image`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    return response.data; // 返回后端响应数据
+  } catch (error) {
+    console.error("上传失败:", error);
+    throw error;
+  }
+};
+
+export const getAvatarUrl = (fileName: string) => {
+  return `${API_BASE_URL}/${fileName}`; // 返回完整的头像 URL
+};
