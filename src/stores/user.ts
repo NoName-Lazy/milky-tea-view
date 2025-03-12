@@ -44,7 +44,7 @@ export const useUserStore = defineStore("user", {
       this.account = name;
     },
     setPassword(pwd: string) {
-      this.password = pwd;
+      this.password = encryptText(pwd);
     },
   },
   persist: {

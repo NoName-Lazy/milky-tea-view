@@ -42,7 +42,7 @@
         </nut-form>
       </nut-col>
     </nut-row>
-    <div class="center">
+    <nut-row class="center">
       <nut-animate type="float" loop>
         <nut-button
           plain
@@ -53,7 +53,13 @@
           >登录</nut-button
         >
       </nut-animate>
-    </div>
+    </nut-row>
+    <nut-divider dashed :style="{ color: '#880000' }" />
+    <nut-row class="center">
+      <router-link :to="{ name: 'Register' }">
+        <div class="register">若还没有账号，请注册</div>
+      </router-link>
+    </nut-row>
   </div>
 </template>
 
@@ -62,7 +68,7 @@ import { apiLogin } from "@/utils/apiUtils";
 import { alertSuccess } from "@/utils/showMessage";
 import { reactive, ref, watch } from "vue";
 import logoSrc from "@/assets/coffee.jpg";
-import { gotoBack } from "@/router";
+import { gotoBack, gotoRegister } from "@/router";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
 const userStore = useUserStore();
@@ -105,18 +111,78 @@ const checkFormValidation = () => {
 watch(formData, () => {
   checkFormValidation();
 });
-
-function dealNavBack() {
-  gotoBack();
-}
 </script>
 
 <style scoped>
+.login {
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.nut-navbar {
+  background-color: #880000; /* 导航栏背景色 */
+  color: white; /* 导航栏文字颜色 */
+}
+
+.img {
+  margin-top: 30px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 图片阴影 */
+  border-radius: 10px; /* 图片圆角 */
+}
+
+.nut-form {
+  margin-top: 20px;
+}
+
+.nut-form-item {
+  margin-bottom: 15px;
+}
+
+.nut-input {
+  border-radius: 8px; /* 输入框圆角 */
+  border: 1px solid #ddd; /* 输入框边框 */
+  padding: 10px;
+  font-size: 14px;
+}
+
+.nut-button {
+  width: 100%;
+  max-width: 200px;
+  margin-top: 20px;
+  border-radius: 25px; /* 按钮圆角 */
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease; /* 按钮 hover 动画 */
+}
+
+.nut-button:disabled {
+  background-color: #ccc; /* 禁用按钮背景色 */
+  color: #666; /* 禁用按钮文字颜色 */
+}
+
+.nut-button:not(:disabled):hover {
+  background-color: #660000; /* 按钮 hover 背景色 */
+  color: white; /* 按钮 hover 文字颜色 */
+}
+
+.nut-divider {
+  margin: 20px 0;
+}
+
+.register {
+  color: #880000; /* 注册链接颜色 */
+  font-size: 14px;
+  text-decoration: none; /* 去掉下划线 */
+  transition: color 0.3s ease; /* 链接 hover 动画 */
+}
+
+.register:hover {
+  color: #660000; /* 注册链接 hover 颜色 */
+}
+
 .center {
   display: flex;
   justify-content: center;
-}
-.img {
-  margin-top: 40px;
+  margin-top: 10px;
 }
 </style>

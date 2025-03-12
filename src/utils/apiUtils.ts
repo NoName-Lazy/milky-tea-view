@@ -42,7 +42,7 @@ export async function apiLogin(loginData: any) {
     userStore.setLoginState(true);
     return Promise.resolve(res?.data);
   } catch (error: any) {
-    alertFail(apiLogin.name, error?.message);
+    alertFail(apiLogin.name, error?.response.data.message);
   }
 }
 
@@ -56,7 +56,7 @@ export async function apiGetProfile(id: Number) {
     userStore.setUser(userData.user);
     return Promise.resolve(userData);
   } catch (error: any) {
-    alertFail(apiGetProfile.name, error?.message);
+    alertFail(apiGetProfile.name, error?.response.data.message);
   }
 }
 
@@ -70,13 +70,37 @@ export async function apiLogout() {
     userStore.setUser({});
     return Promise.resolve(res.data ? res.data : res?.statusText);
   } catch (error: any) {
-    alertFail(apiLogout.name, error?.message);
+    alertFail(apiLogout.name, error?.response.data.message);
     if (res?.status && res.status == 401) {
       userStore.setLoginState(false);
       userStore.setToken("");
       userStore.setUser({});
     }
     gotoLogin();
+  }
+}
+
+export async function apiRegister(registerData: {
+  account: string;
+  password: string;
+  address: string;
+  type: string;
+}) {
+  let user = {
+    address: registerData.address,
+  };
+  userStore = useUserStore();
+  try {
+    let res = await axiosClient.post("/register", qs.stringify(registerData));
+    console.log(res);
+    alertSuccess(apiRegister.name, "注册成功");
+    userStore.setAccount(registerData.account);
+    userStore.setPassword(registerData.password);
+    userStore.setUser(user);
+
+    return Promise.resolve(res);
+  } catch (error: any) {
+    alertFail(apiLogout.name, error?.response.data.message);
   }
 }
 
@@ -97,7 +121,7 @@ export async function apiModifyPassword(modifyData: {
 
     return Promise.resolve(res);
   } catch (error: any) {
-    alertFail(apiModifyPassword.name, error?.message);
+    alertFail(apiModifyPassword.name, error?.response.data.message);
     return Promise.reject(error);
   }
 }
@@ -119,7 +143,51 @@ export async function apiModifyUsername(modifyData: {
 
     return Promise.resolve(res);
   } catch (error: any) {
-    alertFail(apiModifyUsername.name, error?.message);
+    alertFail(apiModifyUsername.name, error?.response.data.message);
+    return Promise.reject(error);
+  }
+}
+
+export async function apiModifyEmail(modifyData: {
+  id: number;
+  email: string;
+}) {
+  userStore = useUserStore();
+  try {
+    let res = await axiosClient.patch(
+      "/modify-email",
+      qs.stringify(modifyData)
+    );
+    alertSuccess(apiModifyEmail.name, res?.data?.message);
+    // console.log(res);
+    userStore.setUser(res?.data?.user);
+    // console.log(userStore);
+
+    return Promise.resolve(res);
+  } catch (error: any) {
+    alertFail(apiModifyEmail.name, error?.response.data.message);
+    return Promise.reject(error);
+  }
+}
+
+export async function apiModifyPhone(modifyData: {
+  id: number;
+  phone: string;
+}) {
+  userStore = useUserStore();
+  try {
+    let res = await axiosClient.patch(
+      "/modify-phone",
+      qs.stringify(modifyData)
+    );
+    alertSuccess(apiModifyPhone.name, res?.data?.message);
+    // console.log(res);
+    userStore.setUser(res?.data?.user);
+    // console.log(userStore);
+
+    return Promise.resolve(res);
+  } catch (error: any) {
+    alertFail(apiModifyPhone.name, error?.response.data.message);
     return Promise.reject(error);
   }
 }
