@@ -94,7 +94,7 @@ async function LogIn() {
 const customBlurValidate = (prop: any) => {
   formRef.value?.validate(prop).then(({ valid, errors }: any) => {
     if (valid) {
-      console.log("success:", formData);
+      console.log("success");
     } else {
       console.warn("error:", errors);
     }

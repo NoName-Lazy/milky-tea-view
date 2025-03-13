@@ -18,7 +18,7 @@ export function gotoLogin() {
   router.push({ name: "Login" });
 }
 export function gotoProfile() {
-  router.push({ name: "Profile" });
+  router.push({ name: "Home" });
 }
 export function gotoBack() {
   router.back();

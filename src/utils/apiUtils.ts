@@ -86,17 +86,19 @@ export async function apiRegister(registerData: {
   address: string;
   type: string;
 }) {
-  let user = {
-    address: registerData.address,
-  };
   userStore = useUserStore();
   try {
     let res = await axiosClient.post("/register", qs.stringify(registerData));
-    console.log(res);
+    // console.log(res);
     alertSuccess(apiRegister.name, "注册成功");
-    userStore.setAccount(registerData.account);
-    userStore.setPassword(registerData.password);
-    userStore.setUser(user);
+    if (res.data.user.phone) {
+      userStore.setAccount(res.data.user.phone);
+    } else {
+      userStore.setAccount(res.data.user.email);
+    }
+    userStore.setPassword(res.data.user.password);
+    res.data.user.password = userStore.password;
+    userStore.setUser(res.data.user);
 
     return Promise.resolve(res);
   } catch (error: any) {

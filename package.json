@@ -15,6 +15,7 @@
     "@nutui/nutui": "^4.3.13",
     "@nutui/touch-emulator": "^1.0.0",
     "@varlet/ui": "^3.9.0",
+    "@vuemap/vue-amap": "^2.1.9",
     "axios": "^1.8.1",
     "browser-image-compression": "^2.0.2",
     "crypto-js": "^4.2.0",
@@ -22,6 +23,7 @@
     "pinia-plugin-persistedstate": "^4.2.0",
     "qs": "^6.14.0",
     "vue": "^3.5.13",
+    "vue-amap": "^0.5.10",
     "vue-router": "^4.5.0"
   },
   "devDependencies": {

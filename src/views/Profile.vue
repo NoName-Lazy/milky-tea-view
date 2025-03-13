@@ -190,6 +190,7 @@ import {
   Notice,
 } from "@nutui/icons-vue";
 import { uploadImage, getAvatarUrl } from "@/utils/apiUtils";
+import { isEmailValid, isPasswordValid } from "@/utils/checkUtils";
 const userStore = useUserStore();
 const userStoreRef = storeToRefs(userStore);
 const userDetail: any = userStore.user;
@@ -226,14 +227,14 @@ function login() {
   gotoLogin();
 }
 
-// 打开文件选择器
+
 const openFilePicker = () => {
   if (fileInput.value) {
     fileInput.value.click();
   }
 };
 
-// 处理文件选择
+
 const handleFileChange = async (event: Event) => {
   const target = event.target as HTMLInputElement;
   if (target.files && target.files.length > 0) {
@@ -242,8 +243,8 @@ const handleFileChange = async (event: Event) => {
       const response = await uploadImage(userDetail.id, file);
       // console.log(response);
 
-      avatarUrl.value = getAvatarUrl(response.user.avatar); // 更新头像 URL
-      // console.log(avatarUrl.value);
+      avatarUrl.value = getAvatarUrl(response.user.avatar); 
+ 
 
       console.log("上传成功");
     } catch (error) {
@@ -277,16 +278,6 @@ async function changePassword() {
     console.error("密码修改失败:", error);
     alert("密码修改失败，请重试");
   }
-}
-
-function isPasswordValid(password: string): boolean {
-  const hasLetter = /[a-zA-Z]/.test(password);
-  const hasNumber = /\d/.test(password);
-  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-  const conditionsMet =
-    [hasLetter, hasNumber, hasSpecialChar].filter(Boolean).length >= 2;
-  return conditionsMet;
 }
 
 async function changeUsername() {
@@ -325,10 +316,7 @@ async function changeEmail() {
   }
 }
 
-function isEmailValid(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
-}
+
 
 async function changePhone() {
   const phone = newPhone.value;
